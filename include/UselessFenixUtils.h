@@ -397,6 +397,13 @@ namespace FenixUtils
 
 	void damageav_attacker(RE::Actor* victim, RE::ACTOR_VALUE_MODIFIERS::ACTOR_VALUE_MODIFIER i1, RE::ActorValue i2, float val, RE::Actor* attacker);
 	void damageav(RE::Actor* a, RE::ActorValue av, float val);
+    RE::TESShout* GetShout(RE::Actor* a);
+    bool IsWordUnlocked(int a1, int a2, int a3, RE::TESWordOfPower* word);
+    void RemoveAllItemsFor(RE::InventoryChanges* changes, RE::TESObjectREFR* refr, RE::TESObjectREFR* to_give, char a4, char a5, char a6);
+	bool WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword);
+	bool HasKeywordAll(RE::Actor* actor, RE::BGSKeyword* keyword);
+    bool is_casting(RE::Character* character);
+    RE::EnchantmentItem* GetWeapEnch(RE::Actor* a, bool left);
 	RE::TESObjectWEAP* get_UnarmedWeap();
 	float PlayerCharacter__get_reach(RE::Actor* a);
 	float GetHeadingAngle(RE::TESObjectREFR* a, const RE::NiPoint3& a_pos, bool a_abs);
