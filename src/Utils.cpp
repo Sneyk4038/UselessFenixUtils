@@ -937,7 +937,89 @@ namespace FenixUtils
 	{
 		a->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage, av, -val);
 	}
+   	bool IsWordUnlocked(int a1, int a2, int a3, RE::TESWordOfPower* word)
+	{
+		using func_t = decltype(IsWordUnlocked);
+		REL::Relocation<func_t> func{ REL::ID(54869) };
+		return func(a1, a2, a3, word);
+	}
+	RE::TESShout* GetShout(RE::Actor* a)
+	{
+		using func_t = decltype(GetShout);
+		REL::Relocation<func_t> func{ REL::ID(37822) };
+		return func(a);
+	}
+	void RemoveAllItemsFor(RE::InventoryChanges* changes, RE::TESObjectREFR* refr, RE::TESObjectREFR* to_give, char a4, char a5, char a6)
+	{
+		using func_t = decltype(RemoveAllItemsFor);
+		REL::Relocation<func_t> func{ REL::ID(15878) };
+		return func(changes, refr, to_give, a4, a5, a6);
+	};
+	bool WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword)
+	{
+		if (actor && keyword) {
+			auto inv = actor->GetInventoryChanges();
+			if (!inv) {
+				return false;
+			}
+			using FuncT = bool (*)(RE::InventoryChanges*, RE::BGSKeyword*);
+			const REL::Relocation<FuncT> func{ RELOCATION_ID(15808, 0) };
+			return func(inv, keyword);
+		}
+		return false;
+	}
+	bool HasKeywordAll(RE::Actor* actor, RE::BGSKeyword* keyword)
+	{
+		const auto result = actor->HasKeyword(keyword) ||
+		                    TESObjectREFR__HasEffectKeyword(actor, keyword) ||
+		                    WornHasKeyword(actor, keyword);
+		return result;
+	}
+	bool is_casting(RE::Character* character)
+	{
+		if (character->IsDead()) {
+			return false;
+		}
 
+		const auto caster_left = character->GetMagicCaster(RE::MagicSystem::CastingSource::kLeftHand);
+		const auto caster_right = character->GetMagicCaster(RE::MagicSystem::CastingSource::kRightHand);
+
+		if ((caster_left && caster_left->currentSpell && character->IsCasting(caster_left->currentSpell)) || 
+			(caster_right && caster_right->currentSpell && character->IsCasting(caster_right->currentSpell))) {
+			return true;
+		}
+		return false;
+	}
+	RE::EnchantmentItem* GetWeapEnch(RE::Actor* a, bool left)
+	{
+		auto inv = a->GetInventory([](RE::TESBoundObject& a_object) {
+			if (a_object.IsWeapon()) {
+				return true;
+			}
+			return false;
+		});
+
+		bool checkleft = false;
+		for (auto& [item, data] : inv) {
+			const auto& [count, entry] = data;
+			if (entry->extraLists) {
+				for (const auto& xList : *entry->extraLists) {
+					const auto xEnchLeft = xList->GetByType<RE::ExtraWornLeft>();
+					const auto xEnchRight = xList->GetByType<RE::ExtraWorn>();
+					if ((xEnchLeft || xEnchRight) && xList->GetByType<RE::ExtraEnchantment>()) {
+						if (xEnchLeft)
+							checkleft = true;
+						else if (xEnchRight)
+							checkleft = false;
+						if (checkleft == left) {
+							return xList->GetByType<RE::ExtraEnchantment>()->enchantment;
+						}
+					}
+				}
+			}
+		}
+		return nullptr;
+	}
 	RE::TESObjectWEAP* get_UnarmedWeap()
 	{
 		constexpr REL::ID UnarmedWeap(static_cast<std::uint64_t>(514923));
